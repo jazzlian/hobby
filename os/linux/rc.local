@@ -1,0 +1,5 @@
+# CPU 성능 설정 x86 onprimess
+for i in {0..7};
+do
+  echo 'performance' > /sys/devices/system/cpu/cpu$i/cpufreq/scaling_governor;
+done
