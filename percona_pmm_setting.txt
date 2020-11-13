@@ -1,0 +1,87 @@
+#
+docker create -v /srv --name pmm-data percona/pmm-server:2 /bin/true
+docker run -d -p 80:80 -p 443:443 --volumes-from pmm-data --name pmm-server --restart always percona/pmm-server:2
+
+# for ubuntu
+wget https://repo.percona.com/apt/percona-release_latest.$(lsb_release -sc)_all.deb
+dpkg -i percona-release_latest.$(lsb_release -sc)_all.deb
+apt-get update
+apt-get install pmm2-client
+
+# for redhat
+yum install https://repo.percona.com/yum/percona-release-latest.noarch.rpm
+yum install pmm2-client
+
+# os register
+pmm-admin config --server-insecure-tls --server-url=https://admin:<password>@localhost
+
+##
+## Monitoring
+##
+## Requirements: Server to client communication over ports, 42000 - 51999 by default.
+##
+
+# mysql 8.0
+Create user 'pmm'@'localhost' identified by '<password>';
+Grant all privileges on *.* to 'pmm'@'localhost' with grant option;
+Flush privileges;
+Register the server for monitoring
+
+sudo  pmm-admin add mysql --username=pmm --password=<password> --query-source=perfschema <friendlyName>
+
+# mysql 5.7
+Grant all privileges on *.* to 'pmm'@'localhost' identified by '<password>' with grant option;
+Flush privileges;
+Register the server for monitoring
+
+sudo pmm-admin add mysql --username=pmm --password=<password> --query-source=perfschema <friendlyName>
+
+# postgresql
+
+CREATE USER pmm WITH SUPERUSER ENCRYPTED PASSWORD '<password>';
+Register the server for monitoring
+
+sudo pmm-admin add postgresql --username='pmm' --password=<password> <friendlyName>
+
+# mongodb
+
+Create a Percona Monitoring and Management specific user for monitoring (from the MongoDB CLI)
+
+Enter the MongoDB Console: mongo
+
+use admin
+
+db.createRole({
+role: "explainRole",
+privileges: [{
+resource: {
+db: "",
+collection: ""
+},
+actions: [
+"listIndexes",
+"listCollections",
+"dbStats",
+"dbHash",
+"collStats",
+"find"
+]
+}],
+roles:[]
+})
+db.getSiblingDB("admin").createUser({
+user: "pmm",
+pwd: "<password>",
+roles: [
+{ role: "explainRole", db: "admin" },
+{ role: "clusterMonitor", db: "admin" },
+{ role: "read", db: "local" }
+]
+})
+exit
+Register the server for monitoring
+
+sudo pmm-admin add mongodb --username=pmm --password=<password> <friendlyName>
+
+
+# aws rds
