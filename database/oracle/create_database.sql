@@ -18,4 +18,4 @@ CHARACTER SET AL32UTF8
 NATIONAL CHARACTER SET AL16UTF16;
 
 @?/rdbms/admin/catalog.sql
-@?/rdbms/admin/cataproc.sql
+@?/rdbms/admin/catproc.sql
