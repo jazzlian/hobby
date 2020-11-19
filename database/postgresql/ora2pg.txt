@@ -1,0 +1,34 @@
+
+# Install Oracle Instance Client
+rpm -ivh oracle-instantclient12.2-basic-12.2.0.1.0-1.x86_64.rpm
+rpm -ivh oracle-instantclient12.2-devel-12.2.0.1.0-1.x86_64.rpm
+rpm -ivh oracle-instantclient12.2-jdbc-12.2.0.1.0-1.x86_64.rpm
+rpm -ivh oracle-instantclient12.2-sqlplus-12.2.0.1.0-1.x86_64.rpm
+
+# postgres client install
+yum install postgres postgres-devel postgres-lib -y
+
+# perl DBI install
+yum install perl-DBD perl-DBI-Pg perl-DBI-ODBC -y
+
+# setting oracle env
+export ORACLE_HOME=
+export PATH
+export LD_LIBRARY_PATH=
+
+
+# DBD::Oracle install
+git clone https://github.com/perl5-dbi/DBD-Oracle
+perl Makefile.pl
+make install
+
+# ora2pg install
+git clone https://github.com/darold/ora2pg
+perl Makefile.pl
+make install
+
+ora2pg --project_base /home/test --init_project hr_project
+ora2pg -t COPY -o data.sql -b ./data -c ./config/ora2pg.conf
+
+
+psql "host=rp-az-pg-01.postgres.database.azure.com port=5432 dbname=prod user=rockplace@rp-az-pg-01 sslmode=require"

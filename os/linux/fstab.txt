@@ -1,0 +1,5 @@
+#
+tmpfs       /tmp        tmpfs   defaults    0   0
+#
+/dev/sdc1   /data       xfs     
+/dev/sdd1   /pgsql      ext4 noatime,nobarrier,errors=remount-ro 0 1
