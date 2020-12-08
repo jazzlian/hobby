@@ -1,0 +1,12 @@
+cat /sys/block/sdd/queue/scheduler
+
+
+if test -f /sys/block/sdc/queue/scheduler; then
+   echo mq-deadline > /sys/block/sdc/queue/scheduler
+fi
+if test -f /sys/block/sdd/queue/scheduler; then
+   echo mq-deadline > /sys/block/sdd/queue/scheduler
+fi
+if test -f /sys/block/sde/queue/scheduler; then
+   echo mq-deadline > /sys/block/sde/queue/scheduler
+fi

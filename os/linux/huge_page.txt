@@ -1,2 +1,32 @@
-cat never > /sys/kernel/mm/redhat_transparent_hugepage/enabled
-cat never > /sys/kernel/mm/transparent_hugepage/enabled
+if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
+   echo never > /sys/kernel/mm/transparent_hugepage/enabled
+fi
+if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
+   echo never > /sys/kernel/mm/transparent_hugepage/defrag
+fi
+
+or
+
+
+The preferred method to disable Transparent HugePages is to add "transparent_hugepage=never" to the kernel boot line in the "/etc/grub.conf" file.
+
+   title Oracle Linux Server (2.6.39-400.24.1.el6uek.x86_64)
+            root (hd0,0)
+            kernel /vmlinuz-2.6.39-400.24.1.el6uek.x86_64 ro root=/dev/mapper/vg_ol6112-lv_root rd_NO_LUKS  KEYBOARDTYPE=pc KEYTABLE=uk
+    LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16  rd_NO_DM rd_LVM_LV=vg_ol6112/lv_swap rd_LVM_LV=vg_ol6112/lv_root rhgb quiet numa=off
+    transparent_hugepage=never
+            initrd /initramfs-2.6.39-400.24.1.el6uek.x86_64.img
+
+
+or
+
+#!/bin/sh
+
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root" 1>&2
+   exit 1
+fi
+
+for KERNEL in /boot/vmlinuz-*; do
+    grubby --update-kernel="$KERNEL" --args='transparent_hugepage=never'
+done
