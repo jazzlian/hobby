@@ -1,0 +1,4 @@
+./runInstaller -silent -showProgress -ignorePrereq -ignoreSysPrereqs -responseFile /home/oracle/stage/database/db_install.rsp
+
+ignoreSysPrereqs
+ignorePrereq

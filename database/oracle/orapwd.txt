@@ -1,0 +1,1 @@
+orapwd file=orapwAEGIS.ora password=aegis1234 entries=10

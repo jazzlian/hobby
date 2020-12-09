@@ -1,0 +1,5 @@
+/etc/pam.d/login
+
+session required pam_limits.so
+
+출처: https://leejongy.tistory.com/entry/오라클-설치시-환경-변수값-설명 [Oracle Note]
