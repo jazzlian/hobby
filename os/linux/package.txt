@@ -3,6 +3,6 @@ yum upgrade
 
 yum install redhat-lsb gcc gcc-c++ make gdb git automake autoconf libaio-dev flex bison ncurse ncurse-devel openssl-devel unixODBC-devel zlib-devel
 yum install net-tools bind-utils sysstat glances htop mc lynx ntp ethtool hdparm
-yum install open-jdk
+yum install java-11-openjdk java-11-openjdk-devel java-11-openjdk-jmods java-11-openjdk-src java-11-openjdk-static-libs
 yum install binutils compat-libstdc++-33 elfutils-libelf elfutils-libelf-devel glibc glibc-devel glibc-common ksh libgcc libstdc++ numactl-devel numactl
 yum install tuned
