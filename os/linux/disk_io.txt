@@ -10,3 +10,13 @@ fi
 if test -f /sys/block/sde/queue/scheduler; then
    echo mq-deadline > /sys/block/sde/queue/scheduler
 fi
+
+if test -f /sys/block/sdc/queue/read_ahead_kb; then
+   echo 4096 > /sys/block/sdc/queue/read_ahead_kb
+fi
+if test -f /sys/block/sdd/queue/read_ahead_kb; then
+   echo 4096  > /sys/block/sdd/queue/read_ahead_kb
+fi
+if test -f /sys/block/sde/queue/read_ahead_kb; then
+   echo 4096  > /sys/block/sde/queue/read_ahead_kb
+fi
