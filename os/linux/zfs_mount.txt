@@ -1,0 +1,10 @@
+zpool create -f -m /firstzfs firstzfs -o ashift=12 /dev/nvme1n1p2
+
+zfs create zdata/PGDATA \
+  -o mountpoint=/zdata/PGDATA \
+  -o atime=off \
+  -o canmount=on \
+  -o compression=lz4 \
+  -o quota=100G \
+  -o recordsize=8k \
+  -o logbias=throughput
