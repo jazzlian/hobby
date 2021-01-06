@@ -1,0 +1,28 @@
+#
+freebsd-update fetch
+freebsd-update install
+
+#
+pkg update
+
+#
+portsnap auto
+
+#
+pkg install open-vm-tools vim zsh git htop py37-glances-3.1.4
+pkg install cmake gmake autoconf automake flex bison libtool readline pkgconf
+pkg install llvm90 llvm-devel openssl openssl-devel libxml2 libxslt icu tcl86
+
+#
+/etc/fstab
+
+#
+tmpfs                   /tmp            tmpfs           rw,mode=1777    0       0
+proc                    /proc           procfs          rw              0       0
+fdescfs                 /dev/fd         fdescfs         rw              0       0
+
+
+zfs destroy zroot/tmp
+
+
+
