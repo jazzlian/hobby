@@ -1,0 +1,8 @@
+
+-- redhat
+sudo yum install -y bison-devel readline-devel zlib-devel openssl-devel wget git cmake gdb
+sudo yum groupinstall -y 'Development Tools'
+
+
+-- debian/ubuntu
+apt-get install cmake gdb git build-essential libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc
