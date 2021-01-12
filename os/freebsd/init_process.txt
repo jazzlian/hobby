@@ -9,9 +9,9 @@ pkg update
 portsnap auto
 
 #
-pkg install open-vm-tools vim zsh git htop py37-glances-3.1.4
-pkg install cmake gmake autoconf automake flex bison libtool readline pkgconf
-pkg install llvm90 llvm-devel openssl openssl-devel libxml2 libxslt icu tcl86
+pkg install open-vm-tools vim zsh git htop py37-glances-3.1.4 lynx wget py37-pip
+pkg install cmake gmake gdb autoconf automake flex bison libtool readline pkgconf jade
+pkg install llvm11 llvm-devel openssl openssl-devel libxml2 libxslt icu tcl86 binutils
 
 #
 /etc/fstab
@@ -25,4 +25,78 @@ fdescfs                 /dev/fd         fdescfs         rw              0       
 zfs destroy zroot/tmp
 
 
+# /etc/sysctl.conf
+#
+kern.maxusers=1024
+kern.ipc.shmall=2097152
+kern.ipc.shmmax=8589934592
+kern.ipc.semmap=256
+kern.ipc.semmns=2048
+kern.ipc.semmni=128
+kern.ipc.shmseg=1024
+kern.ipc.maxsockets=256000
+kern.ipc.maxsockbuf=2621440
+kern.ipc.shm_use_phys=1
+kern.ipc.somaxconn=32768
+kern.ipc.nmbclusters=200000
+kern.ipc.nmbjumbop=100000
 
+kern.maxfilesperproc=104856
+kern.threads.max_threads_per_proc=16384
+
+kern.maxswzone=335544320
+kern.maxfiles=400000
+
+net.inet.ip.portrange.randomized=0
+net.inet.ip.portrange.first=1024
+net.inet.ip.portrange.last=65535
+
+net.inet.tcp.fast_finwait2_recycle=1
+net.inet.tcp.sendspace=131072
+net.inet.tcp.recvspace=131072
+net.inet.udp.recvspace=65536
+net.local.stream.sendspace=82320
+net.local.stream.recvspace=82320
+net.inet.tcp.local_slowstart_flightsize=10
+
+vfs.vmiodirenable=1
+
+# zfs
+zpool create -f -m /data zdata /dev/nvme1n1p2
+
+zfs create  \
+  -o mountpoint=/data/DATA \
+  -o atime=off \
+  -o canmount=on \
+  # -o compression=lz4 \
+  # -o quota=100G \
+  -o recordsize=8k \
+  # -o logbias=throughput \
+  zdata/DATA
+
+# user add
+addgroup 
+
+/etc/login.conf
+
+postgres:
+    :lang=ko_KR.UTF-8:
+    :setenv=LC_COLLATE=C:
+    :maxproc=unlimited:
+    :openfiles=unlimited:
+    :tc=default:
+
+cap_mkdb /etc/login.conf
+
+/etc/rc.conf
+postgresql_class="postgres"
+postgresql_enable="NO"
+
+./configure --prefix=/opt/PostgreSQL/13 \
+--with-llvm --with-icu --with-perl --with-python --with-openssl --with-libxml --with-libxslt \
+--with-system-tzdata=/usr/share/zoneinfo \
+--with-readline  --enable-nls  --with-uuid=bsd \
+--with-includes=/usr/local/include \
+--with-libraries=/usr/local/lib \
+--with-pgport=5432 --with-blocksize=4 --with-wal-blocksize=4 --with-segsize=2 \
+--with-pam --with-bsd-auth --with-ldap

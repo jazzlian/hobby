@@ -1,5 +1,5 @@
 #
 tmpfs       /tmp        tmpfs   defaults    0   0
 #
-/dev/sdc1   /data       xfs  rw,noatime,nobarrier,inode64,logbsize=256k  0 0 -- xfs   
-/dev/sdd1   /pgsql      ext4 noatime,nobarrier,errors=remount-ro 0 1
+/dev/sdc1   /data       xfs  rw,noatime,nodiratime,nobarrier,inode64,logbsize=256k  0 0 -- xfs   
+/dev/sdd1   /pgsql      ext4 noatime,nodiratime,nobarrier,errors=remount-ro 0 1

@@ -1,0 +1,179 @@
+===========================================================================================================================
+■ PMM 오픈소스 모니터링 설치 가이드
+# Server OS      : CentOS7
+# Client OS / DB : CentOS6,7 / PostgreSQL
+
+** PMM 서버는 도커 컨테이너로 제공되기때문에 반드시 설치 전 도커를 설치해야한다
+===========================================================================================================================
+
+===========================================================================================================================
+-- [ PMM 서버 ]
+===========================================================================================================================
+
+-- #####################
+-- ##### 1. 도커 설치 #####
+-- #####################
+
+-- 1) 도커 설치 필수 패키지 설치
+# yum install -y yum-utils device-mapper-persistent-data lvm2
+# yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+# yum makecache fast
+
+-- 2) 도커 설치
+# yum install docker-ce
+
+-- 3) 도커 실행 및 서비스 활성화(enable) 및 상태 조회
+# systemctl start docker
+# systemctl enable docker
+
+# systemctl status docker
+
+-- 4) docker-compose 설치
+# curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+
+-- 5) 실행권한 부여
+# chmod +x /usr/local/bin/docker-compose
+
+-- 6) 설치 확인
+# docker-compose --version
+
+-- #####################
+-- ##### 2. 도커 세팅 #####
+-- #####################
+
+-- 1) PMM 서버 컨테이너 이미지 받기
+# docker pull percona/pmm-server:2
+
+-- 2) 도커 pmm-data 구성
+# docker create -v /srv --name pmm-data percona/pmm-server:2 /bin/true
+
+-- 3) 도커 서버 컨테이너 구성
+# docker run -d -p 80:80 -p 443:443 --volumes-from pmm-data --name pmm-server --restart always percona/pmm-server:2
+
+------------------------------------------------------------------------------------------------------------------------
+참고) 기본 포트 구성은 80:80 443:443 이지만, 다른 서비스가 80,443 포트를 사용 중일 경우 아래와 같이 포트를 변경해서 사용하면 된다
+# docker run -d -p 8090:80 -p 4443:443 --volumes-from pmm-data --name pmm-server --restart always percona/pmm-server:2
+------------------------------------------------------------------------------------------------------------------------
+
+-- 4) 도커 구성 확인
+# docker ps -a
+
+--결과----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CONTAINER ID   IMAGE                  COMMAND                CREATED              STATUS                        PORTS                                         NAMES
+c974e80b13f4   percona/pmm-server:2   "/opt/entrypoint.sh"   About a minute ago   Up About a minute (healthy)   0.0.0.0:8090->80/tcp, 0.0.0.0:4443->443/tcp   pmm-server
+edf635f3b584   percona/pmm-server:2   "/bin/true"            3 minutes ago        Created                                                                     pmm-data
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- 5) pmm-server grafana 확인
+http://PMM서버ip:8090    ( http://192.168.0.15:8090 )
+
+
+===========================================================================================================================
+-- [ PMM 클라이언트 ]
+===========================================================================================================================
+
+-- ########################
+-- ##### 1. 클라이언트 구성 #####
+-- ########################
+
+-- 1) PMM 클라이언트 설치 파일다운
+# cd /usr/local/src
+# wget https://www.percona.com/downloads/pmm2/2.9.1/binary/redhat/7/x86_64/pmm2-client-2.9.1-6.el7.x86_64.rpm
+
+--------------------------------------------------------------------------------------------------------------
+** CentOS 6버전
+https://downloads.percona.com/downloads/pmm2/2.9.1/binary/redhat/6/x86_64/pmm2-client-2.9.1-6.el6.x86_64.rpm
+--------------------------------------------------------------------------------------------------------------
+
+-- 2) PMM 클라이언트 설치
+# rpm -ivh pmm2-client-2.9.1-6.el7.x86_64.rpm
+
+-- 3) 계정생성 확인 ( 생성 계정명 : pmm-agent )
+# cat /etc/passwd | grep pmm-agent
+pmm-agent:x:997:993:pmm-agent:/usr/local/percona/:/bin/false
+
+-------------------------------------------------------------------------------
+참고)
+설치 시 pmm-agent 서비스 계정이 생성이 된다. 보안상 계정 생성을 막아논 서버에서는 잠시 해제 후 설치를 하도록 하자.
+-------------------------------------------------------------------------------
+
+-- 4) 클라이언트 서버에서 Manager 모니터링 등록 
+** 아래 --server-url 부분에 pmmserver-ip 부분을 변경 해야함
+# pmm-admin config --server-insecure-tls --server-url=https://admin:admin@pmmserverIP:4443
+ex) pmm-admin config --server-insecure-tls --server-url=https://admin:admin@192.168.0.15:4443  ( *접속 ID/PW를 변경하려면 admin:admin 을 변경해주면 된다 )
+
+--결과-----------------------------------------------------------------------
+Checking local pmm-agent status...
+pmm-agent is running.
+Registering pmm-agent on PMM Server...
+Registered.
+Configuration file /usr/local/percona/pmm2/config/pmm-agent.yaml updated.
+Reloading pmm-agent configuration...
+Configuration reloaded.
+Checking local pmm-agent status...
+pmm-agent is running.
+---------------------------------------------------------------------------
+
+-- 5) postgresql.conf 파일 수정
+------------------------------------------------
+shared_preload_libraries = 'pg_stat_statements'
+track_activity_query_size = 2048
+pg_stat_statements.track = all
+------------------------------------------------
+
+** 컨피그 파일 적용을 위해 DB 재기동 필요
+$ pg_ctl -D $PGDATA -mf stop
+
+-- 6) PostgreSQL에 PMM 계정 생성 및 권한 할당 ( 기존 postgres계정을 사용할 것으로 별도의 계정은 생성하지 않고 패스워드만 부여 해준다 )
+postgres=# \password 
+
+-------------------------------------------------------------------------------
+참고) 별도의 계정을 생성해주려면 아래와 같이 생성해준다
+postgres=# CREATE USER postgres WITH superuser ENCRYPTED PASSWORD 'new1234!';
+-------------------------------------------------------------------------------
+
+-- 7) Extension 확장모듈 설치 
+postgres=# CREATE EXTENSION pg_stat_statements SCHEMA public;
+
+----------------------------------------------------------------------------------------------------------------
+** 설치 전 위 /엔진경로/shared/extension 경로에 extension 설치관련파일이 없다면 해당 extension을 find로 찾아 아래와 같이 컴파일을 먼저 진행해준다
+# cd /usr/local/src/postgresql-10.14/contrib/pg_stat_statements
+# make && make install
+----------------------------------------------------------------------------------------------------------------
+
+-- 8) 수집된 쿼리 조회
+postgres=# select * from pg_stat_statements;
+
+-- 9) PostgreSQL 모니터링 등록 ( service-name 부분은 server 혹은 db 이름으로 수정 )
+# pmm-admin add postgresql --username=postgres --password=new1234! postgres 192.168.0.13:5438
+
+-------------------------------------------------------------------------------
+**참고)
+slow query를 모니터링 하고 싶다면, 에이전트 등록시에 –query-source=pgstatements 옵션을 추가 해줍니다.
+-------------------------------------------------------------------------------
+
+-- 10) track_io_timing 설정변경 ( track_io_timing 설정이 활성화 된 경우에만 읽기 및 쓰기 시간 통계 캡처가 가능 )
+postgres=# alter system set track_io_timing=on;
+ALTER SYSTEM
+
+postgres=# select pg_reload_conf();
+2021-01-11 23:20:49.659 KST [4333] LOG:  received SIGHUP, reloading configuration files
+2021-01-11 23:20:49.659 KST [4333] LOG:  parameter "track_io_timing" changed to "on"
+ pg_reload_conf
+----------------
+ t
+(1 row)
+
+-- 11) 정상 등록 확인 ( 5분 후 데이터 유입 확인 )
+http://PMM서버ip:8090   ( http://192.168.0.15:8090 )
+
+--> 접속정보는 위 PMM 클라이언트 가이드 4) 클라이언트 서버에서 Manager 모니터링 등록 부분을 참조하면 되며
+--> 여기서는 admin / admin 로 접속하면 된다
+
+===========================================================================================================================
+
+■ 참고URL
+https://m.blog.naver.com/scvpark/222086831562
+https://rastalion.me/%EC%98%A4%ED%94%88%EC%86%8C%EC%8A%A4-%EB%AA%A8%EB%8B%88%ED%84%B0%EB%A7%81-%ED%88%B4-pmm2-mysql-mariadb-postgresql-mongo/
+
+===========================================================================================================================
