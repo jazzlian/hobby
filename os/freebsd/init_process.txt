@@ -99,4 +99,4 @@ postgresql_enable="NO"
 --with-includes=/usr/local/include \
 --with-libraries=/usr/local/lib \
 --with-pgport=5432 --with-blocksize=4 --with-wal-blocksize=4 --with-segsize=2 \
---with-pam --with-bsd-auth --with-ldap
+--with-pam 
