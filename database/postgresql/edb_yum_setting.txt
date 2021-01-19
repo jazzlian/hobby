@@ -22,3 +22,15 @@ systemctl start edb-as-11
 # Connect to the database server
 # sudo su - enterprisedb
 # psql postgres
+
+
+#################################################
+
+echo "deb [arch=amd64] https://apt.enterprisedb.com/$(lsb_release -cs)-edb/ $(lsb_release -cs) main" > /etc/apt/sources.list.d/edb-$(lsb_release -cs).list
+echo "machine apt.enterprisedb.com login msyoun password KzjJ9tpnJhSkJSvN" > /etc/apt/auth.conf.d/edb.conf
+apt-get -y install apt-transport-https
+wget -q -O - https://apt.enterprisedb.com/edb-deb.gpg.key  | sudo apt-key add -
+apt update
+apt install edb-as13-server
+
+systemctl disable edb-as-13

@@ -1,5 +1,7 @@
+-- 01.create user
+-- 
+
 create user hjin 
-with ENCRYPTED password 'hjin1234'
-login 
+with login encrypted password 'hjin1234' 
 in role pg_monitor
 ;

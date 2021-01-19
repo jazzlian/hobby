@@ -1,1 +1,2 @@
-create schema hjin AUTHORIZATION hjin;
+create schema hjin
+AUTHORIZATION hjin;
