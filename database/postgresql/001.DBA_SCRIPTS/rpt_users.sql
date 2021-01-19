@@ -1,9 +1,9 @@
 --
 -- rpt_users
 -- 
-\echo 'Input User Name : ' :v_usename
-
-\set v_usename %1
+\echo ''
+\prompt 'Input User Name : ' v_usename
+\echo ''
 
 select  
     usename, 
