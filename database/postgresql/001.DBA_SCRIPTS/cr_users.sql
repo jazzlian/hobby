@@ -2,7 +2,11 @@
 -- cr_user
 -- create user
 
-create user hjin 
-with login encrypted password 'hjin1234' 
-in role pg_monitor
+\echo ''
+\prompt 'Input User Name : ' v_usename
+\prompt 'Input password  : ' v_password
+\echo ''
+
+create user :v_usename
+with login encrypted password :'v_password' 
 ;

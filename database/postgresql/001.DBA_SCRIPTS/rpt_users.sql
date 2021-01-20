@@ -30,5 +30,6 @@ select
     useconfig
 from pg_catalog.pg_user
 where :'v_usename' is not NULL
+and usename !~ '^pg_'
 and usename ilike concat(:'v_usename', '%')
 ;
