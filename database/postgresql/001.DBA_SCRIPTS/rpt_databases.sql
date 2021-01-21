@@ -13,8 +13,12 @@ SELECT d.datname as "Name",
        age(d.datfrozenxid) as "Age",
        pg_size_pretty(pg_database_size(d.oid)) as "Size",
        t.spcname as "Tblspc", 
-       pg_catalog.array_to_string(d.datacl, E'\n') AS "Access privileges"
-FROM pg_catalog.pg_database d left outer join pg_tablespace t on t.oid = d.dattablespace
+       pg_catalog.array_to_string(d.datacl, E'\n') AS "Access privileges",
+       s.temp_files,
+       s.temp_bytes,
+       s.stats_reset
+FROM pg_catalog.pg_database d inner join pg_tablespace t on t.oid = d.dattablespace
+                              inner join pg_stat_database s on s.datid = d.oid
 where :'v_datname' is null
 union all
 SELECT d.datname as "Name",
@@ -25,8 +29,12 @@ SELECT d.datname as "Name",
        age(d.datfrozenxid) as "Age",
        pg_size_pretty(pg_database_size(d.oid)) as "Size",
        t.spcname as "Tblspc", 
-       pg_catalog.array_to_string(d.datacl, E'\n') AS "Access privileges"
-FROM pg_catalog.pg_database d left outer join pg_tablespace t on t.oid = d.dattablespace
+       pg_catalog.array_to_string(d.datacl, E'\n') AS "Access privileges",
+       s.temp_files,
+       s.temp_bytes,
+       s.stats_reset
+FROM pg_catalog.pg_database d inner join pg_tablespace t on t.oid = d.dattablespace
+                              inner join pg_stat_database s on s.datid = d.oid
 where :'v_datname' is not null
 and d.datname ilike concat(:'v_datname', '%')
 ;
