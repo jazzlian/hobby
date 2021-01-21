@@ -52,6 +52,7 @@
 
 db_name='ORCL'
 sga_target=16G
+#memory_target=0
 processes = 150
 audit_file_dest='/u01/app/oracle/admin/orcl/adump'
 audit_trail ='db'
@@ -69,6 +70,12 @@ undo_tablespace='UNDOTBS1'
 control_files = (/oradata/ORCL/ora_control1, /oradata/ORCL/ora_control2)
 compatible ='12.2.0'
 #
+filesystemio_options=setall
+disk_asynch_io=true
+pga_aggregate_target=10G
+#use_large_pages=only
+#lock_sga=true
+
 ############################
 # Archive Log Destinations -benr(10/15/04)
 ############################

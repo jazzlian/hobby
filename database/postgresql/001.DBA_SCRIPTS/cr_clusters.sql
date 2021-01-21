@@ -1,3 +1,7 @@
+--
+-- cr_
+-- create roles
+
 #
 initdb –D $PGDATA  \
       -–no-locale \
