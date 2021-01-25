@@ -17,17 +17,20 @@ select datname,
        client_hostname,
        client_port,
        backend_start,
+       current_timestamp - backend_start as duration_time,
        xact_start,
        query_start,
+       GREATEST((CURRENT_TIMESTAMP - xact_start), (current_timestamp - query_start)) as query_elaps_time,
        state_change,
        case
            when wait_event is not null then
                concat(wait_event_type, ' : ', wait_event)
            end               as wait,
        state,
-       substr(query, 1, 255) as query
+       substr(query, 1, 1024) as query
 from pg_stat_activity
 where true
+  and pid != pg_backend_pid()
   and backend_type = 'client backend'
   and datname ilike concat(:'v_datname', '%')
   and usename ilike concat(:'v_usename', '%')
