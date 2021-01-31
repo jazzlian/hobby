@@ -10,8 +10,8 @@ portsnap auto
 
 #
 pkg install open-vm-tools vim zsh git htop py37-glances-3.1.4 lynx wget py37-pip
-pkg install cmake gmake gdb autoconf automake flex bison libtool readline pkgconf jade
-pkg install llvm11 llvm-devel openssl openssl-devel libxml2 libxslt icu tcl86 binutils
+pkg install cmake gmake gdb autoconf automake flex bison libtool readline pkgconf jade gettext
+pkg install llvm11 llvm-devel openssl openssl-devel libxml2 libxslt icu tcl86 binutils libpam-devel
 
 #
 /etc/fstab
@@ -91,6 +91,8 @@ cap_mkdb /etc/login.conf
 /etc/rc.conf
 postgresql_class="postgres"
 postgresql_enable="NO"
+
+export PYTHOIN=/usr/bin/python3
 
 ./configure --prefix=/opt/PostgreSQL/13 \
 --with-llvm --with-icu --with-perl --with-python --with-openssl --with-libxml --with-libxslt \
