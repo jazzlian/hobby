@@ -11,7 +11,7 @@ portsnap auto
 #
 pkg install open-vm-tools vim zsh git htop py37-glances-3.1.4 lynx wget py37-pip
 pkg install cmake gmake gdb autoconf automake flex bison libtool readline pkgconf jade gettext
-pkg install llvm11 llvm-devel openssl openssl-devel libxml2 libxslt icu tcl86 binutils libpam-devel
+pkg install llvm11 llvm-devel openssl openssl-devel libxml2 libxslt icu tcl86 binutils pam-modules-2.2_1 
 
 #
 /etc/fstab
@@ -75,15 +75,15 @@ zfs create  \
   zdata/DATA
 
 # user add
-addgroup 
+adduser 
 
 /etc/login.conf
 
 postgres:
-    :lang=ko_KR.UTF-8:
-    :setenv=LC_COLLATE=C:
-    :maxproc=unlimited:
-    :openfiles=unlimited:
+    :lang=ko_KR.UTF-8:\
+    :setenv=LC_COLLATE=C:\
+    :maxproc=unlimited:\
+    :openfiles=unlimited:\
     :tc=default:
 
 cap_mkdb /etc/login.conf
@@ -93,6 +93,7 @@ postgresql_class="postgres"
 postgresql_enable="NO"
 
 export PYTHOIN=/usr/bin/python3
+export LLVM_CONFIG=/usr/local/llvm11/bin/llvm-configure
 
 ./configure --prefix=/opt/PostgreSQL/13 \
 --with-llvm --with-icu --with-perl --with-python --with-openssl --with-libxml --with-libxslt \
@@ -102,3 +103,6 @@ export PYTHOIN=/usr/bin/python3
 --with-libraries=/usr/local/lib \
 --with-pgport=5432 --with-blocksize=4 --with-wal-blocksize=4 --with-segsize=2 \
 --with-pam 
+
+gmake -j2
+gmake -j2 install-world
