@@ -93,7 +93,7 @@ postgresql_class="postgres"
 postgresql_enable="NO"
 
 export PYTHOIN=/usr/bin/python3
-export LLVM_CONFIG=/usr/local/llvm11/bin/llvm-configure
+export LLVM_CONFIG=/usr/local/llvm11/bin/llvm-config
 
 ./configure --prefix=/opt/PostgreSQL/13 \
 --with-llvm --with-icu --with-perl --with-python --with-openssl --with-libxml --with-libxslt \
