@@ -1,0 +1,16 @@
+--
+-- 01. Docker 
+--
+docker pull centos:7
+
+docker create -v /var/lib/edb --name edb-data centos:7 /bin/true
+
+docker create -i -t -p 5444:5444 -p 222:22 --privileged --volumes-from edb-data \
+              -v /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro \
+               --name edb-server  --hostname edb-server \
+               --oom-kill-disable --memory 4294967296 --memory-swap 1073741824 --memory-swappiness 1 \
+               --shm-size 2147483648 --cpus 1 --cpu-shares 1024 --tmpfs /tmp
+               centos:7 init
+
+docker start edb-server
+docker exec -i -t edb-server /bin/bash
