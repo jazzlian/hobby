@@ -19,6 +19,7 @@ Type=notify
 
 User=enterprisedb
 Group=enterprisedb
+UMask=0022
 
 LimitNOFILE=500000
 LimitNPROC=50000
