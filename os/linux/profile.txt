@@ -1,1 +1,1 @@
-ulimit -n 8192 -u 8192 
+ulimit -n 64000 -u 32000

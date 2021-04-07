@@ -3,3 +3,6 @@ for i in {0..7};
 do
   echo 'performance' > /sys/devices/system/cpu/cpu$i/cpufreq/scaling_governor;
 done
+
+#
+echo 1 > /proc/sys/net/ipv4/conf/all/arp_filter
