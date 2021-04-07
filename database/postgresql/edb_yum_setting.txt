@@ -8,9 +8,24 @@ sed -i "s@<username>:<password>@postgres_rockplace.co.kr:dpUKTKCtAj72L3PG@" /etc
 
 # Install EPEL repository
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+subscription-manager repos --enable "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"  --enable "rhel-ha-for-rhel-*-server-rpms"
+
+or
+
+yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+  # ARCH=$( /bin/arch )
+   # subscription-manager repos --enable "codeready-builder-for-rhel-8-${ARCH}-rpms"
+   # dnf config-manager --set-enabled powertools
 
 # Install selected packages
 yum -y install edb-as11-server edb-jdbc edb-migrationtoolkit 
+
+
+subscription-manager repos --enable rhel-7-server-devtools-rpms
+subscription-manager repos --enable rhel-server-rhscl-7-rpms
+# cd /etc/pki/rpm-gpg
+# wget -O RPM-GPG-KEY-redhat-devel https://www.redhat.com/security/data/a5787476.txt
+# rpm --import RPM-GPG-KEY-redhat-devel
 
 # Initialize Database cluster
 PGSETUP_INITDB_OPTIONS="-E UTF-8" /usr/edb/as11/bin/edb-as-11-setup initdb
